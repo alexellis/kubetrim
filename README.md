@@ -5,6 +5,28 @@ Tidy up old Kubernetes clusters from kubeconfig.
 
 kubetrim tries to connect to each cluster in the current kubeconfig file, and removes any that are unreachable, or which error.
 
+Q&A:
+
+* What if I like doing things the long way?
+
+    You can combine `kubectl config get-clusters` with `kubectl config use-context` and `kubectl get nodes`, followed by `kubectl config delete-cluster` and `kubectl config delete-context` for each.
+
+* Doesn't [my favourite tool] have an option to do this?
+
+    Feel free to use your favourite tool instead. kubetrim is a memorable name, and a simple tool that just does one job, similar to `kubectx`
+
+* What if I want to keep a cluster that is unreachable?
+
+    This is not supported at this time, if you need that feature, open an issue.
+
+* What if my cluster is valid, but kubetrim cannot detect it?
+
+    Open an issue, and we can look at adding support for your use-case.
+
+* `kubetrim` is great, how can I support you?
+
+    Have a look at [arkade](https://github.com/alexellis/arkade) and [k3sup](https://github.com/alexellis/k3sup), you may like those too. You can also [sponsor me via GitHub](https://github.com/sponsors/alexellis).
+
 ## Usage
 
 ```bash
