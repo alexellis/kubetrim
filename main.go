@@ -24,6 +24,7 @@ import (
 
 var (
 	writeFile bool
+	force     bool
 )
 
 func main() {
@@ -44,6 +45,7 @@ func main() {
 	}
 
 	flag.BoolVar(&writeFile, "write", true, "Write changes to the kubeconfig file")
+	flag.BoolVar(&force, "force", false, "Force delete all contexts, even if all are unreachable")
 	flag.Parse()
 
 	// Load the kubeconfig file
@@ -102,10 +104,17 @@ func main() {
 	}
 
 	if writeFile {
-		// Save the modified kubeconfig
-		if err = clientcmd.WriteToFile(*config, kubeconfig); err != nil {
-			fmt.Printf("Error saving updated kubeconfig: %v\n", err)
+
+		if len(contextsToDelete) == len(config.Contexts) && !force {
+			fmt.Println("No contexts are working, the Internet may be down, use --force to delete all contexts anyway.")
 			os.Exit(1)
+		}
+		if len(contextsToDelete) > 0 {
+			// Save the modified kubeconfig
+			if err = clientcmd.WriteToFile(*config, kubeconfig); err != nil {
+				fmt.Printf("Error saving updated kubeconfig: %v\n", err)
+				os.Exit(1)
+			}
 		}
 		fmt.Printf("Updated: %s (in %s).\n", kubeconfig, time.Since(st).Round(time.Millisecond))
 	}

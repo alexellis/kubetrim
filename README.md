@@ -9,7 +9,7 @@ Q&A:
 
 * What if I like doing things the long way?
 
-    You can combine `kubectl config get-clusters` with `kubectl config use-context` and `kubectl get nodes`, followed by `kubectl config delete-cluster` and `kubectl config delete-context` for each.
+    You can combine `kubectl config get-clusters` with `kubectl config use-context` and `kubectl get nodes`, followed by `kubectl config delete-cluster` and `kubectl config delete-context` for each. `kubectx -d` will remove a context, but leaves the cluster in your kubeconfig file, so requires additional steps.
 
 * Doesn't [my favourite tool] have an option to do this?
 
@@ -34,6 +34,10 @@ Q&A:
 * Can I run kubetrim every time I open a terminal?
 
     Yes, you can add `kubetrim &` to your `.bashrc`, `.bash_profile` or `.zshrc` file, which will run in the background, and not slow down your terminal session from starting up.
+
+* What if my WiFi is down and I run this tool?
+
+    If all clusters show as unavailable, kubetrim will not delete any clusters, in this case add `--force` to the command.
 
 ## Usage
 
@@ -60,6 +64,20 @@ $ kubectx
 
 default
 kind-2
+```
+
+What if the Internet is unavailable, and all clusters report as unavailable?
+
+```bash
+# Take down WiFi/Ethernet
+
+$ kubetrim
+
+No contexts are working, the Internet may be down, use --force to delete all contexts anyway.
+
+# Force the deletion, even if all clusters are unavailable.
+
+$ kubetrim --force
 ```
 
 Try out kubetrim without writing changes to the kubeconfig file:
