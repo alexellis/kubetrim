@@ -27,6 +27,14 @@ Q&A:
 
     Have a look at [arkade](https://github.com/alexellis/arkade) and [k3sup](https://github.com/alexellis/k3sup), you may like those too. You can also [sponsor me via GitHub](https://github.com/sponsors/alexellis).
 
+* How can I run kubetrim daily?
+
+    Create a crontab with the following expression: `0 0 * * * kubetrim`
+
+* Can I run kubetrim every time I open a terminal?
+
+    Yes, you can add `kubetrim &` to your `.bashrc`, `.bash_profile` or `.zshrc` file, which will run in the background, and not slow down your terminal session from starting up.
+
 ## Usage
 
 ```bash
