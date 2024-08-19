@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/alexellis/kubetrim/pkg"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -22,12 +23,6 @@ import (
 )
 
 var (
-	// Version is the version of the tool
-	Version = "dev"
-
-	// GitCommit is the git commit of the tool
-	GitCommit = ""
-
 	writeFile bool
 )
 
@@ -36,7 +31,9 @@ func main() {
 	// set usage:
 
 	flag.Usage = func() {
-		fmt.Printf("kubetrim Copyright Alex Ellis (c) 2024\n\n")
+
+		fmt.Printf("kubetrim (%s %s) Copyright Alex Ellis (c) 2024\n\n", pkg.Version, pkg.GitCommit)
+		fmt.Print("Sponsor Alex on GitHub: https://github.com/sponsors/alexellis\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 		fmt.Fprintf(flag.CommandLine.Output(), "kubetrim removes contexts & clusters from your kubeconfig if they are not accessible.\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "Set the kubeconfig file to use through the KUBECONFIG environment variable\n")
@@ -62,7 +59,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("kubetrim (%s %s) by Alex Ellis \n\nLoaded: %s. Checking..\n", Version, GitCommit, kubeconfig)
+	fmt.Printf("kubetrim (%s %s) by Alex Ellis \n\nLoaded: %s. Checking..\n", pkg.Version, pkg.GitCommit, kubeconfig)
 
 	st := time.Now()
 	// List of contexts to be deleted

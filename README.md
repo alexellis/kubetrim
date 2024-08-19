@@ -1,7 +1,7 @@
 kubetrim
 ====================================================
 
-Tidy up any old or broken Kubernetes clusters and contexts from your kubeconfig.
+Tidy up old Kubernetes clusters from kubeconfig.
 
 kubetrim tries to connect to each cluster in the current kubeconfig file, and removes any that are unreachable, or which error.
 
