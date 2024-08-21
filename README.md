@@ -1,4 +1,4 @@
-kubetrim
+kubetrim 📏
 ====================================================
 
 Trim 📏 your KUBECONFIG automatically.
