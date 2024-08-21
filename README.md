@@ -66,6 +66,18 @@ default
 kind-2
 ```
 
+Try out kubetrim without writing changes to the kubeconfig file:
+
+```bash
+$ kubetrim --write=false
+```
+
+Use a different kubeconfig file:
+
+```bash
+$ KUBECONFIG=$HOME/.kube/config.bak kubetrim
+```
+
 What if the Internet is unavailable, and all clusters report as unavailable?
 
 ```bash
@@ -78,18 +90,6 @@ No contexts are working, the Internet may be down, use --force to delete all con
 # Force the deletion, even if all clusters are unavailable.
 
 $ kubetrim --force
-```
-
-Try out kubetrim without writing changes to the kubeconfig file:
-
-```bash
-$ kubetrim --dry-run
-```
-
-Use a different kubeconfig file:
-
-```bash
-$ KUBECONFIG=$HOME/.kube/config.bak kubetrim
 ```
 
 ## Installation
