@@ -1,9 +1,15 @@
 kubetrim
 ====================================================
 
-Tidy up old Kubernetes clusters from kubeconfig.
+Trim 📏 your KUBECONFIG automatically.
 
-kubetrim tries to connect to each cluster in the current kubeconfig file, and removes any that are unreachable, or which error.
+kubetrim tidies up old and broken cluster and context entries from your kubeconfig file.
+
+It works like this:
+
+1) Loads the config specified by KUBECONFIG
+2) Tries to connect to each
+3) Writes a new file with only the ones that it could access
 
 Q&A:
 
