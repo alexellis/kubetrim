@@ -44,7 +44,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 
-	flag.BoolVar(&writeFile, "write", true, "Write changes to the kubeconfig file")
+	flag.BoolVar(&writeFile, "write", true, "Write changes to the kubeconfig file, set to false for a dry-run.")
 	flag.BoolVar(&force, "force", false, "Force delete all contexts, even if all are unreachable")
 	flag.Parse()
 
