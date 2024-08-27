@@ -3,6 +3,10 @@ kubetrim 📏
 
 Trim 📏 your KUBECONFIG automatically.
 
+[![Sponsor Alex](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/alexellis)](https://github.com/sponsors/alexellis) [![build](https://github.com/alexellis/kubetrim/actions/workflows/build.yml/badge.svg)](https://github.com/alexellis/kubetrim/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Downloads](https://img.shields.io/github/downloads/alexellis/kubetrim/total)
+
 kubetrim tidies up old and broken cluster and context entries from your kubeconfig file.
 
 It works like this:
