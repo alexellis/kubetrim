@@ -1,3 +1,6 @@
 #!/bin/sh
 
-for f in bin/kubetrim*; do shasum -a 256 $f > $f.sha256; done
+cd bin
+
+for f in kubetrim*; do shasum -a 256 $f > ../uploads/$f.sha256; done
+
