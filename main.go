@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/alexellis/kubetrim/pkg"
@@ -13,12 +14,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/exec"
-
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"  // Import for GCP auth
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc" // Import for OIDC (often used with EKS)
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-
 	"k8s.io/client-go/util/homedir"
 )
 
@@ -28,11 +27,8 @@ var (
 )
 
 func main() {
-
-	// set usage:
-
+	// Set usage
 	flag.Usage = func() {
-
 		fmt.Printf("kubetrim (%s %s) Copyright Alex Ellis (c) 2024\n\n", pkg.Version, pkg.GitCommit)
 		fmt.Print("Sponsor Alex on GitHub: https://github.com/sponsors/alexellis\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
@@ -62,6 +58,16 @@ func main() {
 	}
 
 	fmt.Printf("kubetrim (%s %s) by Alex Ellis \n\nLoaded: %s. Checking..\n", pkg.Version, pkg.GitCommit, kubeconfig)
+
+	// Start the spinner in a goroutine
+	var wg sync.WaitGroup
+	stopSpinner := make(chan struct{})
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		spinner(stopSpinner)
+	}()
 
 	st := time.Now()
 	// List of contexts to be deleted
@@ -94,9 +100,14 @@ func main() {
 			fmt.Printf("❌ - (%v)\n", err)
 			contextsToDelete = append(contextsToDelete, contextName)
 		} else {
+			fmt.Println("/n")
 			fmt.Println("✅")
 		}
 	}
+
+	// Stop the spinner
+	close(stopSpinner)
+	wg.Wait()
 
 	// Delete the contexts that are not working
 	for _, contextName := range contextsToDelete {
@@ -104,7 +115,6 @@ func main() {
 	}
 
 	if writeFile {
-
 		if len(contextsToDelete) == len(config.Contexts) && !force {
 			fmt.Println("No contexts are working, the Internet may be down, use --force to delete all contexts anyway.")
 			os.Exit(1)
@@ -116,7 +126,25 @@ func main() {
 				os.Exit(1)
 			}
 		}
-		fmt.Printf("Updated: %s (in %s).\n", kubeconfig, time.Since(st).Round(time.Millisecond))
+		fmt.Printf("\n Updated: %s (in %s).\n", kubeconfig, time.Since(st).Round(time.Millisecond))
+	}
+}
+
+// spinner runs a visual timer in the terminal
+func spinner(stop <-chan struct{}) {
+	chars := []rune{'|', '/', '-', '\\'}
+	for {
+		for _, char := range chars {
+			select {
+			case <-stop:
+				fmt.Print("\r") // Clear spinner line
+				return
+			default:
+				fmt.Printf("")
+				fmt.Printf("\r%c Checking ... ", char)
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
 	}
 }
 
@@ -131,7 +159,6 @@ func checkCluster(clientset *kubernetes.Clientset) error {
 
 // deleteContextAndCluster removes the context and its associated cluster from the config
 func deleteContextAndCluster(config *clientcmdapi.Config, contextName string) {
-
 	// Get the cluster name associated with the context
 	clusterName := config.Contexts[contextName].Cluster
 
