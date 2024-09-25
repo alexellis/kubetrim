@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/alexellis/kubetrim/pkg"
@@ -25,6 +26,7 @@ import (
 var (
 	writeFile bool
 	force     bool
+	keepFile  string
 )
 
 func main() {
@@ -39,6 +41,8 @@ func main() {
 		fmt.Fprintf(flag.CommandLine.Output(), "kubetrim removes contexts & clusters from your kubeconfig if they are not accessible.\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "Set the kubeconfig file to use through the KUBECONFIG environment variable\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "or the default location will be used: ~/.kube/config\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "For partially available contexts, add each name on its own line in:\n~/.local/kubetrim/keep.txt\n\n")
+
 		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n")
 
 		flag.PrintDefaults()
@@ -46,7 +50,20 @@ func main() {
 
 	flag.BoolVar(&writeFile, "write", true, "Write changes to the kubeconfig file, set to false for a dry-run.")
 	flag.BoolVar(&force, "force", false, "Force delete all contexts, even if all are unreachable")
+	flag.StringVar(&keepFile, "keep-file", "$HOME/.local/kubetrim/keep.txt", "Path to the keep file for clusters that are partially available")
 	flag.Parse()
+
+	keepFile = os.ExpandEnv(keepFile)
+
+	var keepContexts []string
+	if _, err := os.Stat(keepFile); err == nil {
+		contexts, err := loadKeepContexts(keepFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error loading %s: error: %s", keepFile, err)
+			os.Exit(1)
+		}
+		keepContexts = contexts
+	}
 
 	// Load the kubeconfig file
 	kubeconfig := filepath.Join(homedir.HomeDir(), ".kube", "config")
@@ -64,12 +81,24 @@ func main() {
 	fmt.Printf("kubetrim (%s %s) by Alex Ellis \n\nLoaded: %s. Checking..\n", pkg.Version, pkg.GitCommit, kubeconfig)
 
 	st := time.Now()
-	// List of contexts to be deleted
+	// List of ckeepContextsontexts to be deleted
 	var contextsToDelete []string
 
 	// Enumerate and check all contexts
 	for contextName := range config.Contexts {
 		fmt.Printf("  - %s: ", contextName)
+		skip := false
+		for _, keep := range keepContexts {
+			if keep == contextName {
+				skip = true
+				break
+			}
+		}
+
+		if skip {
+			fmt.Printf("skipping due to keep list ⏩\n")
+			continue
+		}
 
 		// Set the context for the current iteration
 		clientConfig := clientcmd.NewNonInteractiveClientConfig(*config, contextName, &clientcmd.ConfigOverrides{}, nil)
@@ -151,4 +180,23 @@ func deleteContextAndCluster(config *clientcmdapi.Config, contextName string) {
 	if !clusterUsed {
 		delete(config.Clusters, clusterName)
 	}
+}
+
+func loadKeepContexts(path string) ([]string, error) {
+	keep := []string{}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return keep, err
+	}
+	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
+
+	for _, line := range lines {
+		ln := strings.TrimSpace(line)
+		if len(ln) > 0 && !strings.HasPrefix(ln, "#") {
+			keep = append(keep, ln)
+		}
+	}
+
+	return keep, nil
 }

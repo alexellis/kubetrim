@@ -27,7 +27,7 @@ Q&A:
 
 * What if I want to keep a cluster that is unreachable?
 
-    This is not supported at this time, if you need that feature, open an issue.
+    You can add each context name to the keep file at `~/.local/kubetrim/keep.txt`. You can also use comments in this file by prefixing the comment with `# Needs work VPN etc`
 
 * What if my cluster is valid, but kubetrim cannot detect it?
 
