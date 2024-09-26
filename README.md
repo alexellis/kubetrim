@@ -17,6 +17,10 @@ It works like this:
 
 Q&A:
 
+* `kubetrim` is great, how can I support you?
+
+    You can [sponsor me via GitHub](https://github.com/sponsors/alexellis) - the more sponsors, the more time I'll spend on tools like kubetrim, Have a [arkade](https://github.com/alexellis/arkade) and [k3sup](https://github.com/alexellis/k3sup).
+
 * What if I like doing things the long way?
 
     You can combine `kubectl config get-clusters` with `kubectl config use-context` and `kubectl get nodes`, followed by `kubectl config delete-cluster` and `kubectl config delete-context` for each. `kubectx -d` will remove a context, but leaves the cluster in your kubeconfig file, so requires additional steps.
@@ -32,10 +36,6 @@ Q&A:
 * What if my cluster is valid, but kubetrim cannot detect it?
 
     Open an issue, and we can look at adding support for your use-case.
-
-* `kubetrim` is great, how can I support you?
-
-    Have a look at [arkade](https://github.com/alexellis/arkade) and [k3sup](https://github.com/alexellis/k3sup), you may like those too. You can also [sponsor me via GitHub](https://github.com/sponsors/alexellis).
 
 * How can I run kubetrim daily?
 
@@ -111,6 +111,8 @@ curl -sfLS https://get.arkade.dev | sh
 
 arkade get kubetrim
 ```
+
+Or download it manually via the [Releases page](https://github.com/alexellis/kubetrim/releases)
 
 ## License
 
