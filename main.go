@@ -151,7 +151,10 @@ func main() {
 
 // checkCluster tries to list nodes in the cluster to verify if the context is working
 func checkCluster(clientset *kubernetes.Clientset) error {
-	_, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to connect to cluster: %v", err)
 	}
