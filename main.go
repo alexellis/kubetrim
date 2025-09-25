@@ -24,9 +24,10 @@ import (
 )
 
 var (
-	writeFile bool
-	force     bool
-	keepFile  string
+	writeFile    bool
+	force        bool
+	keepFile     string
+	printVersion bool
 )
 
 func main() {
@@ -51,7 +52,14 @@ func main() {
 	flag.BoolVar(&writeFile, "write", true, "Write changes to the kubeconfig file, set to false for a dry-run.")
 	flag.BoolVar(&force, "force", false, "Force delete all contexts, even if all are unreachable")
 	flag.StringVar(&keepFile, "keep-file", "$HOME/.local/kubetrim/keep.txt", "Path to the keep file for clusters that are partially available")
+	flag.BoolVar(&printVersion, "version", false, "Print the version of kubetrim")
 	flag.Parse()
+
+	// Print version of kubetrim if requested
+	if printVersion {
+		fmt.Printf("kubetrim (%s %s)\n", pkg.Version, pkg.GitCommit)
+		os.Exit(0)
+	}
 
 	keepFile = os.ExpandEnv(keepFile)
 
